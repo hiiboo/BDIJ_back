@@ -21,22 +21,18 @@ return new class extends Migration
             $table->dateTime('start_time');
             // end_time
             $table->dateTime('end_time');
+            // actual_start_time
+            $table->dateTime('actual_start_time')->nullable();
             // comment
             $table->text('comment')->nullable();
             // total_guests
             $table->integer('total_guests')->nullable();
-
             $table->enum('status', ['offer-pending', 'accepted','started', 'finished', 'reviewed', 'cancelled'])->nullable();
             $table->boolean('guest_booking_confirmation')->default(false);
             // guide_booking_confirmation
             $table->boolean('guide_booking_confirmation')->default(false);
-            // offer-pendingを追加したい
-            $table->boolean('offer_pending')->default(false);
             // guest_start_confirmation
             $table->boolean('start_confirmation')->default(false);
-
-            $table->boolean('end_confirmation')->default(false);
-
             // guest_reviewed
             $table->boolean('guest_reviewed')->default(false);
             // guide_reviewed

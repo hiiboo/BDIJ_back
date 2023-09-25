@@ -31,6 +31,7 @@ class BookingSeeder extends Seeder
             }
 
             $start_time = $faker->dateTimeBetween('now', '+1 months');
+            $actual_start_time = $faker->dateTimeBetween($start_time, strtotime('+0.1 hours', $start_time->getTimestamp()));
             $end_time = $faker->dateTimeBetween($start_time, strtotime('+3 hours', $start_time->getTimestamp()));
 
             DB::table('bookings')->insert([
@@ -38,16 +39,15 @@ class BookingSeeder extends Seeder
                 'guest_id' => $guest_id,
                 'start_time' => $start_time,
                 'end_time' => $end_time,
+                'actual_start_time' => $actual_start_time,
                 'comment' => $faker->sentence,
                 'total_guests' => $faker->numberBetween(1, 5),
                 'status' => $faker->randomElement(['offer-pending', 'accepted', 'started', 'finished', 'reviewed', 'cancelled']),
-                'guest_booking_confirmation' => $faker->boolean,
-                'guide_booking_confirmation' => $faker->boolean,
-                'offer_pending' => $faker->boolean,
-                'start_confirmation' => $faker->boolean,
-                'end_confirmation' => $faker->boolean,
-                'guest_reviewed' => $faker->boolean,
-                'guide_reviewed' => $faker->boolean,
+                'guest_booking_confirmation' => false,
+                'guide_booking_confirmation' => false,
+                'start_confirmation' => false,
+                'guest_reviewed' => false,
+                'guide_reviewed' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
