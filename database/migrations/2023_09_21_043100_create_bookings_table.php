@@ -41,6 +41,7 @@ return new class extends Migration
             $table->boolean('guest_reviewed')->default(false);
             // guide_reviewed
             $table->boolean('guide_reviewed')->default(false);
+            $table->softDeletes(); // add this line
             $table->timestamps();
         });
     }

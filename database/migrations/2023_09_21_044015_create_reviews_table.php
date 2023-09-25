@@ -26,6 +26,7 @@ return new class extends Migration
             // review content
             $table->text('content');
             $table->unique(['reviewer_id', 'reviewee_id', 'booking_id']);
+            $table->softDeletes(); // add this line
             $table->timestamps();
         });
     }
