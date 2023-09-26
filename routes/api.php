@@ -32,3 +32,12 @@ Route::post('/bookings/{guide}/reserve', [BookingController::class, 'reserve'])
 
 Route::patch('/bookings/{booking}/accept', [BookingController::class, 'accept'])
     ->name('bookings.accept');
+
+Route::patch('/bookings/{booking}/start', [BookingController::class, 'start'])
+    ->name('bookings.start');
+
+Route::get('/bookings/{booking}/actual-start-time', [BookingController::class, 'getActualStartTime'])
+    ->name('bookings.getActualStartTime');
+
+Route::patch('/bookings/{booking}/finish', [BookingController::class, 'finish'])
+    ->name('bookings.finish');

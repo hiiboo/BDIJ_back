@@ -22,7 +22,7 @@ class BookingController extends Controller
 
     public function reserve(Request $request,User $guide)
     {
-        // if hasSpecificBookingsAsGuide is flase then return error sayng you can not book this guide,if hasSpecificBookingsAsGuide is true and hasSpecificBookingsAsGuest is ture then store the booking and also update the status of the booking to offer-pending and guest_booking_confirmation to true and return success message,if hasSpecificBookingsAsGuest is false then return error saying you can not book
+
         if ($request->user()->isGuest()) {
 
             if (!$guide->isGuide()) {
@@ -66,23 +66,42 @@ class BookingController extends Controller
     }
 
 
-    public function update(Request $request, string $id)
+    public function start(Request $request, Booking $booking)
     {
-        //
+
+        if ($request->user()->isGuest()) {
+            if ($booking->status === 'accepted') {
+                $booking->update([
+                    'start_confirmation' => true,
+                    'guest_booking_confirmation' => false,
+                    'guide_booking_confirmation' => false,
+                    'status' => 'started',
+                    'actual_start_time' => now(),
+                ]);
+                return response()->json(['success' => 'Booking started successfully'], 200);
+            }
+        }
+
     }
 
-    public function startStatus(Request $request, string $id)
+    public function finish(Request $request, Booking $booking)
     {
-        //
+        //statusがstartedからfinishedに変更したいというリクエストが来た時、statusをfinishedにstart_confirmationをfalseに変更してbookings tableにあるbooking情報を更新する
+        if ($request->user()->isGuest()) {
+            if ($booking->status === 'started') {
+                $booking->update([
+                    'start_confirmation' => false,
+                    'status' => 'finished',
+                ]);
+                return response()->json(['success' => 'Booking finished successfully'], 200);
+            }
+        }
     }
 
-    public function endStatus(Request $request, string $id)
+    public function getActualStartTime(Request $request, Booking $booking)
     {
-        //
-    }
+        //return bookings tableからactual_start_timeを、そしてnow()から現在時刻を一緒に返す
+        return response()->json(['actual_start_time' => $booking->actual_start_time, 'now' => now()], 200);
 
-    public function getCurrentTime(Request $request, string $id)
-    {
-        //
     }
 }
