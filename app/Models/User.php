@@ -82,6 +82,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class, 'reviewee_id');
     }
+     
+    // check if user is guest
+    public function isGuest()
+    {
+        return $this->user_type === 'guest';
+    }
+
+    // check if user is guide
+    public function isGuide()
+    {
+        return $this->user_type === 'guide';
+    }
 
     // user_type = guide & status = active & whose booking status = null、reviewed、cancelled or guide_reviewed=true & cosidering soft delete
     public function scopeHasSpecificBookingsAsGuide($query)
@@ -96,17 +108,16 @@ class User extends Authenticatable
         })->withtrashed();
     }
 
-    //user_type = guest & status = active & whose booking status = null、reviewed、cancelled or guest_reviewed = true & cosidering soft delete and return true or false
+    //user_type = guest & whose booking status = null、reviewed、cancelled or guest_reviewed = true & cosidering soft delete and return true or false
     public function hasSpecificBookingsAsGuest()
     {
         return $this->where('user_type', 'guest')
-            ->where('status', 'active')
             ->whereHas('bookingsAsGuest', function ($query) {
             $query->whereNull('status')
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guest_reviewed', true);
-        })->withtrashed()->exists();
+        })->exists();
     }
 
     // hasSpecificBookingsAsGuide method
@@ -119,7 +130,7 @@ class User extends Authenticatable
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guide_reviewed', true);
-        })->withtrashed()->exists();
+        })->exists();
     }
 
     // canCancelBookingAsGuest method(user_type = guest  & whose booking status = offer-pending or accepted)

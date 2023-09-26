@@ -40,4 +40,24 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    //cancellationFeePercentage method status = offer-pending then return 1, status = accepted then return 0.2 other status return error saying "You can't cancel this booking"
+    public function cancellationFeePercentage()
+    {
+        if ($this->status === 'offer-pending') {
+            return 1;
+        } elseif ($this->status === 'accepted') {
+            return 0.2;
+        } else {
+            return 'You can\'t cancel this booking';
+        }
+    }
+
+    // calculateCancellationFee method hourly_rate* result of cancellationFeePercentage method
+    public function calculateCancellationFee()
+    {
+        return $this->guide->hourly_rate * $this->cancellationFeePercentage();
+    }
+    
+
 }
