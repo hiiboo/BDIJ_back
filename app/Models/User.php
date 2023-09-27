@@ -155,22 +155,27 @@ class User extends Authenticatable
     // canGuestWriteReview (user_type = guest & whose booking status = finished & whose booking guest_reviewed = false)
     public function canGuestWriteReview()
     {
-        return $this->where('user_type', 'guest')
-            ->whereHas('bookingsAsGuest', function ($query) {
-            $query->where('status', 'finished')
-                ->where('guest_reviewed', false);
-        })->exists();
+        if (!$this->isGuest()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuest()->where('status', 'finished')
+        ->where('guest_reviewed', false)
+            ->exists();
     }
 
     // canGuideWriteReview (user_type = guide & whose booking status = finished & whose booking guide_reviewed = false)
     public function canGuideWriteReview()
     {
-        return $this->where('user_type', 'guide')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->where('status', 'finished')
-                ->where('guide_reviewed', false);
-        })->exists();
+        if (!$this->isGuide()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuide()->where('status', 'finished')
+        ->where('guide_reviewed', false)
+            ->exists();
     }
+
 
 
     // review ratings order

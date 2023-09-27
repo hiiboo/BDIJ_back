@@ -41,3 +41,9 @@ Route::get('/bookings/{booking}/actual-start-time', [BookingController::class, '
 
 Route::patch('/bookings/{booking}/finish', [BookingController::class, 'finish'])
     ->name('bookings.finish');
+
+Route::post('/bookings/{booking}/reviews/guest', [ReviewController::class, 'postGuestReview'])
+    ->name('reviews.guest');
+
+Route::post('/bookings/{booking}/reviews/guide', [ReviewController::class, 'postGuideReview'])
+    ->name('reviews.guide');
