@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserLoginController;
-use App\Http\Controllers\Auth\UserRegisterController;
 use App\Http\Controllers\Auth\UserLogoutController;
+use App\Http\Controllers\Auth\GuideRegisterController;
+use App\Http\Controllers\Auth\GuestRegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +24,8 @@ Route::get('/', function () {
 Route::prefix('auth')->group(function () {
     // User Routes
     Route::post('user/login', UserLoginController::class)->middleware('guest');
-    Route::post('user/register', UserRegisterController::class)->middleware('guest');
+    Route::post('guide/register', GuideRegisterController::class)->middleware('guest');
+    Route::post('guest/register', GuestRegisterController::class)->middleware('guest');
     Route::post('user/logout', UserLogoutController::class)->middleware('auth:sanctum');
 
 });

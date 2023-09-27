@@ -18,14 +18,13 @@ class ReviewController extends Controller
     
     public function postGuestReview(Request $request, Booking $booking)
     {
-        //guest review post & update review table & guest_reviewed to true in bookings table
+       
         $guest = $request->user();
 
         if (!$guest->isGuest()) {
             return response()->json(['error' => 'Only guests can post reviews.'], 403);
         }
 
-        // Validate the request data
         $data = $request->validate([
             'content' => 'required|string',
             'rating' => 'required|integer|min:1|max:5'
