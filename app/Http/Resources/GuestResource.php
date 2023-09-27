@@ -19,10 +19,20 @@ class GuestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'first_name' => (string) $this->first_name,
-            'last_name' => (string) $this->last_name,
-            'email' => (string) $this->email,
-            // 'reviews' => ReviewResource::collection($this->whenLoaded('reviewer')),
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'gender' => $this->gender,
+            'profile_image' => $this->profile_image,
+            'level' => $this->level,
+            'introduction' => $this->introduction,
+            'hourly_rate' => $this->hourly_rate,
+            'birthday' => $this->birthday,
+            'occupation' => $this->occupation,
+            'user_type' => $this->user_type,
+            'status' => $this->status,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+            'email' => $this->email,
             'bookings' => BookingResource::collection($this->whenLoaded('bookingsAsGuest')),
         ];
     }
