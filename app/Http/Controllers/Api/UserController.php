@@ -71,12 +71,16 @@ class UserController extends Controller
         ]);
     }
 
-    // change user status
+    // change user status and return data and message
     public function changeStatus(Request $request)
     {
         $user = $request->user();
         $data = $request->all();
         $user->update($data);
+        return response()->json([
+            'data' => $user,
+            'message' => 'success'
+        ]);
     }
 
 }

@@ -23,18 +23,18 @@ class RegisterRequest extends FormRequest
     {
         return [
             // 共通のルール
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required',
+            'last_name' => 'required',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'profile_image' => 'nullable|image|max:2048',
+            'profile_image' => 'nullable',
 
             // guideのみのルール
-            'level' => 'sometimes|integer|min:1|max:5',
-            'introduction' => 'sometimes|string|max:1000',
-            'hourly_rate' => 'sometimes|numeric|min:0',
-            'birthday' => 'sometimes|date',
-            'gender' => 'sometimes|in:male,female,other',
+            // 'level' => 'sometimes|integer|min:1|max:5',
+            // 'introduction' => 'sometimes|string|max:1000',
+            // 'hourly_rate' => 'sometimes|numeric|min:0',
+            // 'birthday' => 'sometimes|date',
+            // 'gender' => 'sometimes|in:male,female,other',
         ];
     }
 

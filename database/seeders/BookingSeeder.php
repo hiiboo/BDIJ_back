@@ -38,6 +38,7 @@ class BookingSeeder extends Seeder
                 'actual_start_time' => $actual_start_time,
                 'comment' => $faker->sentence,
                 'total_guests' => $faker->numberBetween(1, 5),
+                'total_amount' => $faker->numberBetween(1000, 10000),
                 'status' => $faker->randomElement(['offer-pending', 'accepted', 'started', 'finished', 'reviewed', 'cancelled']),
                 'guest_booking_confirmation' => false,
                 'guide_booking_confirmation' => false,

@@ -27,6 +27,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Guide Routes guide resource only index, show, update
 Route::apiResource('guide', GuideController::class)->only(['index', 'show', 'update']);
 
+// route for getHourlyRate
+Route::get('/guide/{guide}/hourly-rate', [GuideController::class, 'getHourlyRate'])
+    ->name('guide.hourlyRate');
+
 // showPrivate is a custom route
 Route::get('/guide/{guide}/private', [GuideController::class, 'showPrivate'])
     ->name('guide.showPrivate');
@@ -94,6 +98,6 @@ Route::patch('/user/update', [UserController::class, 'update'])
     ->name('user.update');
 
 // route for changeStatus
-Route::patch('/user/{user}/change-status', [UserController::class, 'changeStatus'])
+Route::patch('/user/change-status', [UserController::class, 'changeStatus'])
     ->name('user.changeStatus');
 

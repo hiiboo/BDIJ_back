@@ -83,5 +83,11 @@ class GuideController extends Controller
         return BookingResource::collection($bookings);
     }
 
+    // guide_id を元に、Userから$guideを取得してその hourly_rateを取得
+    public function getHourlyRate(User $guide)
+    {
+        return response()->json(['hourly_rate' => $guide->hourly_rate]);
+    }
+
 
 }

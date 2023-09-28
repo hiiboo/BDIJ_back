@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Illuminate\Log\Logger;
 
 class BookingController extends Controller
 {
@@ -92,17 +94,40 @@ class BookingController extends Controller
             if(!$request->user()->hasSpecificBookingsAsGuest()){
                 return response()->json(['error' => 'You can not book'], 403);
             }
+            
+            // use diffInHours method of Carbon,to calculate the difference between start_time and end_time
+            $diffInHours = Carbon::parse($request->start_time)->diffInHours(Carbon::parse($request->end_time));
+            Log::debug($request->total_guests);
+            Log::debug($request->total_amount);
+            Log::debug($diffInHours);
+            if ($request->total_guests > 2) {
+                $posted_hourly_rate = ($request->total_amount) / 0.75 / ($request->total_guests) / $diffInHours;
+            } else {
+                $posted_hourly_rate = $request->total_amount / $diffInHours;
+            }
+
+            if ($posted_hourly_rate !== $guide->hourly_rate) {
+                return response()->json(['error' => 'You can\'t book this guide'], 403);
+            }
+
 
             $booking = Booking::create([
-                'guide_id' => 2,
+                'guide_id' => $guide->id,
                 'guest_id' => $request->user()->id,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'status' => 'offer-pending',
+                'total_guests' => $request->total_guests,
+                'total_amount' => $request->total_amount,
+                'comment' => $request->comment,
                 'guest_booking_confirmation' => true,
             ]);
 
-            return response()->json(['success' => 'Booking created successfully'], 200);
+            // return $booking;
+            return response()->json([
+                'data' => $booking,
+                'message' => 'success'
+            ]);
         }
     }
 

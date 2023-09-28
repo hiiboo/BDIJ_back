@@ -19,6 +19,7 @@ class Booking extends Model
         'comment',
         'total_guests',
         'status',
+        'total_amount',
         'guest_booking_confirmation',
         'guide_booking_confirmation',
         'start_confirmation',
