@@ -22,10 +22,19 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'kana' => 'required|string',
-            'password' => 'required|string|confirmed',
+            // 共通のルール
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'profile_image' => 'nullable',
+
+            // guideのみのルール
+            // 'level' => 'sometimes|integer|min:1|max:5',
+            // 'introduction' => 'sometimes|string|max:1000',
+            // 'hourly_rate' => 'sometimes|numeric|min:0',
+            // 'birthday' => 'sometimes|date',
+            // 'gender' => 'sometimes|in:male,female,other',
         ];
     }
 

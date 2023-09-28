@@ -19,6 +19,7 @@ class Booking extends Model
         'comment',
         'total_guests',
         'status',
+        'total_amount',
         'guest_booking_confirmation',
         'guide_booking_confirmation',
         'start_confirmation',
@@ -40,4 +41,36 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    //cancellationFeePercentage method status = offer-pending then return 1, status = accepted then return 0.2 other status return error saying "You can't cancel this booking"
+    public function cancellationFeePercentage()
+    {
+        if ($this->status === 'offer-pending') {
+            return 1;
+        } elseif ($this->status === 'accepted') {
+            return 0.2;
+        } else {
+            return 'You can\'t cancel this booking';
+        }
+    }
+
+    // calculateCancellationFee method hourly_rate* result of cancellationFeePercentage method
+    public function calculateCancellationFee()
+    {
+        return $this->guide->hourly_rate * $this->cancellationFeePercentage();
+    }
+
+    // check request hourly_rate is eqaul to guide hourly_rate & check request booking status is equal to booking status
+    public function isSameAsLastBooking($request)
+    {
+        $lastBooking = $this->getLastBooking();
+
+        if ($lastBooking) {
+            return $lastBooking->guide->hourly_rate === $request->hourly_rate && $lastBooking->status === $request->status;
+        }
+
+        return json_encode(['error' => 'Retry Again']);
+    }
+
+
 }

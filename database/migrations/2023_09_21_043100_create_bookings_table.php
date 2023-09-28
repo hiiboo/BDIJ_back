@@ -27,6 +27,8 @@ return new class extends Migration
             $table->text('comment')->nullable();
             // total_guests
             $table->integer('total_guests')->nullable();
+            // total_amount
+            $table->integer('total_amount');
             $table->enum('status', ['offer-pending', 'accepted','started', 'finished', 'reviewed', 'cancelled'])->nullable();
             $table->boolean('guest_booking_confirmation')->default(false);
             // guide_booking_confirmation
