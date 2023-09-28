@@ -63,6 +63,21 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function lastBookingAsGuest()
+    {
+        return $this->hasOne(Booking::class, 'guest_id')->latest();
+    }
+
+    public function lastBookingAsGuide()
+    {
+        return $this->hasOne(Booking::class, 'guide_id')->latest();
+    }
+
     public function bookingsAsGuest()
     {
         return $this->hasMany(Booking::class, 'guest_id');
@@ -93,6 +108,22 @@ class User extends Authenticatable
     public function isGuide()
     {
         return $this->user_type === 'guide';
+    }
+
+    // get current login user
+    public function getCurrentUser()
+    {
+        return auth()->user();
+    }
+
+    // get the other user of the booking
+    public function getOtherUserOfBooking($booking)
+    {
+        if ($this->isGuest()) {
+            return $booking->guide;
+        }
+
+        return $booking->guest;
     }
 
     // user_type = guide & status = active & whose booking status = null、reviewed、cancelled or guide_reviewed=true & cosidering soft delete
@@ -176,8 +207,6 @@ class User extends Authenticatable
             ->exists();
     }
 
-
-
     // review ratings order
     public function scopeReviewRatings($query)
     {
@@ -215,6 +244,7 @@ class User extends Authenticatable
     {
         return $query->where('updated_at', '>=', now()->subMinutes(15));
     }
+
 
 
 

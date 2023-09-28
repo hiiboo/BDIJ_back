@@ -58,6 +58,18 @@ class Booking extends Model
     {
         return $this->guide->hourly_rate * $this->cancellationFeePercentage();
     }
-    
+
+    // check request hourly_rate is eqaul to guide hourly_rate & check request booking status is equal to booking status
+    public function isSameAsLastBooking($request)
+    {
+        $lastBooking = $this->getLastBooking();
+
+        if ($lastBooking) {
+            return $lastBooking->guide->hourly_rate === $request->hourly_rate && $lastBooking->status === $request->status;
+        }
+
+        return json_encode(['error' => 'Retry Again']);
+    }
+
 
 }

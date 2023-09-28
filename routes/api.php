@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\GuestController;
 use App\Http\Controllers\Api\GuideController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\UserController;
+use Ramsey\Uuid\Guid\Guid;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +27,31 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Guide Routes guide resource only index, show, update
 Route::apiResource('guide', GuideController::class)->only(['index', 'show', 'update']);
 
+// showPrivate is a custom route
+Route::get('/guide/{guide}/private', [GuideController::class, 'showPrivate'])
+    ->name('guide.showPrivate');
+
 Route::apiResource('guest', GuestController::class)->only(['show']);
+
+// showPrivate
+Route::get('/guest/{guest}/private', [GuestController::class, 'showPrivate'])
+    ->name('guest.showPrivate');
+
+// getCurrentUserLocation
+Route::get('/user/current/location', [UserController::class, 'getCurrentUserLocation'])
+    ->name('user.current.location');
+
+// showCurrent
+Route::get('/user/current', [UserController::class, 'showCurrent'])
+    ->name('user.current');
+
+//route for showBookingsAsGuide
+Route::get('/user/current/bookings/guide', [GuideController::class, 'showBookingsAsGuide'])
+    ->name('user.current.bookings.guide');
+
+// route for showBookingsAsGuest
+Route::get('/user/current/bookings/guest', [GuestController::class, 'showBookingsAsGuest'])
+    ->name('user.current.bookings.guest');
 
 Route::post('/bookings/{guide}/reserve', [BookingController::class, 'reserve'])
     ->name('bookings.reserve');
