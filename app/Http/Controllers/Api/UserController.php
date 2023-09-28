@@ -48,4 +48,35 @@ class UserController extends Controller
         ]);
     }
 
+
+    public function update(Request $request)
+    {
+        //update current user's profile use UserResource
+        $user = $request->user();
+        $data = $request->all();
+        $user->update($data);
+        return response()->json([
+            'data' => $user,
+            'message' => 'success'
+        ]);
+    }
+
+    // get me (current user) Auth::user()を使用して、現在ログインしているユーザーを取得
+    public function showMe(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'data' => $user,
+            'message' => 'success'
+        ]);
+    }
+
+    // change user status
+    public function changeStatus(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->all();
+        $user->update($data);
+    }
+
 }

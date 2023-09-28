@@ -85,3 +85,15 @@ Route::get('/user/current/last-booking', [BookingController::class, 'showLastBoo
 Route::get('/user/current/last-booking-status', [BookingController::class, 'showLastBookingStatus'])
     ->name('user.current.lastBookingStatus');
 
+    // route for showMe
+Route::get('/user/me', [UserController::class, 'showMe'])
+    ->name('user.me');
+
+    // route for update
+Route::patch('/user/update', [UserController::class, 'update'])
+    ->name('user.update');
+
+// route for changeStatus
+Route::patch('/user/{user}/change-status', [UserController::class, 'changeStatus'])
+    ->name('user.changeStatus');
+

@@ -83,14 +83,5 @@ class GuideController extends Controller
         return BookingResource::collection($bookings);
     }
 
-    // 
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
 }
