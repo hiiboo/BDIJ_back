@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -14,11 +15,66 @@ class BookingController extends Controller
     {
         $this->middleware('auth:sanctum')->except(['index']);
     }
-    
-    public function show(string $id)
+
+    public function showRelatedUserAndBooking(Booking $booking)
     {
-        //
+        $user = Auth::user();
+
+        if ($user->isGuest()) {
+            
+            $booking->load(['guide', 'guest']);
+        } elseif ($user->isGuide()) {
+          
+            $booking->load(['guest', 'guide']);
+        } else {
+            return response()->json(['error' => 'User is neither a guide nor a guest'], 403);
+        }
+
+        return response()->json(['data' => $booking], 200);
     }
+
+    // show last booking for current user
+    public function showLastBooking()
+    {
+        $user = Auth::user();
+
+        if ($user->isGuest()) {
+            $user->load('lastBookingAsGuest');
+            $lastBooking = $user->lastBookingAsGuest;
+        } elseif ($user->isGuide()) {
+            $user->load('lastBookingAsGuide');
+            $lastBooking = $user->lastBookingAsGuide;
+        } else {
+            return response()->json(['error' => 'User is neither a guide nor a guest'], 403);
+        }
+
+        // return $lastBooking;
+        $lastBookingStatus = $lastBooking ? $lastBooking->status : null;
+        return response()->json (['data'=> 
+        $lastBooking], 200);
+    }
+
+    // show last booking status for current user
+    public function showLastBookingStatus()
+    {
+        $user = Auth::user();
+
+        if ($user->isGuest()) {
+            $user->load('lastBookingAsGuest');
+            $lastBooking = $user->lastBookingAsGuest;
+        } elseif ($user->isGuide()) {
+            $user->load('lastBookingAsGuide');
+            $lastBooking = $user->lastBookingAsGuide;
+        } else {
+            return response()->json(['error' => 'User is neither a guide nor a guest'], 403);
+        }
+
+        // return $lastBooking; 
+        $lastBookingStatus = $lastBooking ? $lastBooking->status : null;
+
+        return response()->json(['data' => $lastBookingStatus], 200);
+    }
+
 
     public function reserve(Request $request,User $guide)
     {
@@ -100,8 +156,15 @@ class BookingController extends Controller
 
     public function getActualStartTime(Request $request, Booking $booking)
     {
-        //return bookings tableからactual_start_timeを、そしてnow()から現在時刻を一緒に返す
-        return response()->json(['actual_start_time' => $booking->actual_start_time, 'now' => now()], 200);
+        //return bookings tableからstart_time, end_time,actual_start_timeを、そしてnow()から現在時刻を一緒に返す
+        $data=[
+            "start_time" => $booking->start_time,
+            "end_time" => $booking->end_time,
+            "actual_start_time" => $booking->actual_start_time,
+            "now" => now(),
+        ];
+        
+        return response()->json(['data' => $data], 200);
 
     }
 }

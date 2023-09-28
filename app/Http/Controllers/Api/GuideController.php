@@ -61,6 +61,22 @@ class GuideController extends Controller
         return new GuideResource($guide);
     }
 
+    // 現在ログインしているユーザーがガイドの場合、そのユーザーに関連した全てのbookingsをGuestControllerで取得
+    public function showBookingsAsGuide()
+    {
+        $user = Auth::user();
+
+        if (!$user-> isGuide()) {
+            return response()->json(['error' => 'Not a guest'], 403);
+        }
+
+        $bookings = $user->bookingsAsGuide;
+
+        // Bookings resourceを使用して、bookingsをjson形式で返す
+        return BookingResource::collection($bookings);
+    }
+
+    // 
 
     /**
      * Update the specified resource in storage.

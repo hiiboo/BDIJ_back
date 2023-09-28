@@ -73,3 +73,15 @@ Route::post('/bookings/{booking}/reviews/guest', [ReviewController::class, 'post
 
 Route::post('/bookings/{booking}/reviews/guide', [ReviewController::class, 'postGuideReview'])
     ->name('reviews.guide');
+
+Route::get('/bookings/{booking}/related-user', [BookingController::class, 'showRelatedUserAndBooking'])
+    ->name('booking.relatedUser');
+
+    // route for showLastBooking
+Route::get('/user/current/last-booking', [BookingController::class, 'showLastBooking'])
+    ->name('user.current.lastBooking');
+
+    // route for showLastBookingStatus
+Route::get('/user/current/last-booking-status', [BookingController::class, 'showLastBookingStatus'])
+    ->name('user.current.lastBookingStatus');
+

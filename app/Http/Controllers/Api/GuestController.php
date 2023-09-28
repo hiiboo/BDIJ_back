@@ -43,6 +43,7 @@ class GuestController extends Controller
 
         return new GuestResource($guest);
     }
+    
 
     public function showBookingsAsGuest()
     {
