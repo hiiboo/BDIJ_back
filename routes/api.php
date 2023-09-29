@@ -20,6 +20,12 @@ use Ramsey\Uuid\Guid\Guid;
 |
 */
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/check-auth', function () {
+        return response()->json(['isLoggedIn' => true]);
+    });
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
