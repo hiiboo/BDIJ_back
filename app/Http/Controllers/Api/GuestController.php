@@ -54,6 +54,7 @@ class GuestController extends Controller
         }
 
         $bookings = $user->bookingsAsGuest;
+        $bookings->load('guide');
 
         return BookingResource::collection($bookings);
     }

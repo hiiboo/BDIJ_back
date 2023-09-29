@@ -71,7 +71,7 @@ class GuideController extends Controller
         return new GuideResource($guide);
     }
 
-    // 現在ログインしているユーザーがガイドの場合、そのユーザーに関連した全てのbookingsをGuestControllerで取得
+    // 現在ログインしているユーザーがガイドの場合、そのユーザーに関連した全てのbookingsをGuestControllerで取得 & add guest firt_name, last_name and guest_image from the $booking->guest
     public function showBookingsAsGuide()
     {
         $user = Auth::user();
@@ -81,9 +81,10 @@ class GuideController extends Controller
         }
 
         $bookings = $user->bookingsAsGuide;
+        $bookings->load('guest');
 
-        // Bookings resourceを使用して、bookingsをjson形式で返す
         return BookingResource::collection($bookings);
+
     }
 
     // guide_id を元に、Userから$guideを取得してその hourly_rateを取得
