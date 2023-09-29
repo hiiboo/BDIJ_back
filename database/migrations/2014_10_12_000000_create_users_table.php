@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('first_name')->nullable();
             // last name
             $table->string('last_name')->nullable();
-            $table->enum('gender', ['male', 'female', 'other']);
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('profile_image')->nullable();
             // language proficiency level
             $table->enum(

@@ -28,6 +28,7 @@ class UserLoginController extends Controller
 
         return response()->json([
             'data' => $user,
+            'token' => $token, //postman authorizationに入れるために追加、productionでは不要
             'message' => 'Login successful'
         ])->withCookie(cookie('token', $token, 60, null, null, false, true)); // httpOnlyをtrueに設定
     }

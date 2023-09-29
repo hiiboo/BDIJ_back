@@ -18,17 +18,13 @@ class BookingSeeder extends Seeder
     {
         $faker = \Faker\Factory::create();
 
-        // 仮にUserテーブルに10件データがあると仮定
-        $userIds = User::pluck('id')->toArray();
+        // guideとguestのユーザーIDをそれぞれ取得
+        $guideIds = User::where('user_type', 'guide')->pluck('id')->toArray();
+        $guestIds = User::where('user_type', 'guest')->pluck('id')->toArray();
 
         foreach (range(1, 50) as $index) {
-            $guide_id = $faker->randomElement($userIds);
-            $guest_id = $faker->randomElement($userIds);
-
-            // 同じIDでないように調整
-            while ($guide_id === $guest_id) {
-                $guest_id = $faker->randomElement($userIds);
-            }
+            $guide_id = $faker->randomElement($guideIds);
+            $guest_id = $faker->randomElement($guestIds);
 
             $start_time = $faker->dateTimeBetween('now', '+1 months');
             $actual_start_time = $faker->dateTimeBetween($start_time, strtotime('+0.1 hours', $start_time->getTimestamp()));
@@ -42,6 +38,7 @@ class BookingSeeder extends Seeder
                 'actual_start_time' => $actual_start_time,
                 'comment' => $faker->sentence,
                 'total_guests' => $faker->numberBetween(1, 5),
+                'total_amount' => $faker->numberBetween(1000, 10000),
                 'status' => $faker->randomElement(['offer-pending', 'accepted', 'started', 'finished', 'reviewed', 'cancelled']),
                 'guest_booking_confirmation' => false,
                 'guide_booking_confirmation' => false,

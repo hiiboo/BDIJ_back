@@ -63,6 +63,23 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = ['review_average', 'review_count'];
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function lastBookingAsGuest()
+    {
+        return $this->hasOne(Booking::class, 'guest_id')->latest();
+    }
+
+    public function lastBookingAsGuide()
+    {
+        return $this->hasOne(Booking::class, 'guide_id')->latest();
+    }
+
     public function bookingsAsGuest()
     {
         return $this->hasMany(Booking::class, 'guest_id');
@@ -83,6 +100,46 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'reviewee_id');
     }
 
+    // get user's review_average
+    public function getReviewAverageAttribute()
+    {
+        return $this->receivedReviews()->avg('rating');
+    }
+
+    // get user's review_count
+    public function getReviewCountAttribute()
+    {
+        return $this->receivedReviews()->count();
+    }
+     
+    // check if user is guest
+    public function isGuest()
+    {
+        return $this->user_type === 'guest';
+    }
+
+    // check if user is guide
+    public function isGuide()
+    {
+        return $this->user_type === 'guide';
+    }
+
+    // get current login user
+    public function getCurrentUser()
+    {
+        return auth()->user();
+    }
+
+    // get the other user of the booking
+    public function getOtherUserOfBooking($booking)
+    {
+        if ($this->isGuest()) {
+            return $booking->guide;
+        }
+
+        return $booking->guest;
+    }
+
     // user_type = guide & status = active & whose booking status = null、reviewed、cancelled or guide_reviewed=true & cosidering soft delete
     public function scopeHasSpecificBookingsAsGuide($query)
     {
@@ -96,17 +153,16 @@ class User extends Authenticatable
         })->withtrashed();
     }
 
-    //user_type = guest & status = active & whose booking status = null、reviewed、cancelled or guest_reviewed = true & cosidering soft delete and return true or false
+    //user_type = guest & whose booking status = null、reviewed、cancelled or guest_reviewed = true & cosidering soft delete and return true or false
     public function hasSpecificBookingsAsGuest()
     {
         return $this->where('user_type', 'guest')
-            ->where('status', 'active')
             ->whereHas('bookingsAsGuest', function ($query) {
             $query->whereNull('status')
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guest_reviewed', true);
-        })->withtrashed()->exists();
+        })->exists();
     }
 
     // hasSpecificBookingsAsGuide method
@@ -119,7 +175,7 @@ class User extends Authenticatable
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guide_reviewed', true);
-        })->withtrashed()->exists();
+        })->exists();
     }
 
     // canCancelBookingAsGuest method(user_type = guest  & whose booking status = offer-pending or accepted)
@@ -144,23 +200,26 @@ class User extends Authenticatable
     // canGuestWriteReview (user_type = guest & whose booking status = finished & whose booking guest_reviewed = false)
     public function canGuestWriteReview()
     {
-        return $this->where('user_type', 'guest')
-            ->whereHas('bookingsAsGuest', function ($query) {
-            $query->where('status', 'finished')
-                ->where('guest_reviewed', false);
-        })->exists();
+        if (!$this->isGuest()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuest()->where('status', 'finished')
+        ->where('guest_reviewed', false)
+            ->exists();
     }
 
     // canGuideWriteReview (user_type = guide & whose booking status = finished & whose booking guide_reviewed = false)
     public function canGuideWriteReview()
     {
-        return $this->where('user_type', 'guide')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->where('status', 'finished')
-                ->where('guide_reviewed', false);
-        })->exists();
-    }
+        if (!$this->isGuide()) {
+            return false;
+        }
 
+        return $this->bookingsAsGuide()->where('status', 'finished')
+        ->where('guide_reviewed', false)
+            ->exists();
+    }
 
     // review ratings order
     public function scopeReviewRatings($query)
@@ -199,6 +258,7 @@ class User extends Authenticatable
     {
         return $query->where('updated_at', '>=', now()->subMinutes(15));
     }
+
 
 
 
