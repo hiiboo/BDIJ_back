@@ -66,6 +66,11 @@ Route::get('/user/current/bookings/guest', [GuestController::class, 'showBooking
 Route::post('/bookings/{guide}/reserve', [BookingController::class, 'reserve'])
     ->name('bookings.reserve');
 
+    // route for cancelAsGuide
+Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancelAsGuide'])
+    ->name('bookings.cancelAsGuide');
+ 
+
 Route::patch('/bookings/{booking}/accept', [BookingController::class, 'accept'])
     ->name('bookings.accept');
 
