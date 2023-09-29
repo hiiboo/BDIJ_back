@@ -35,6 +35,11 @@ class RegisterRequest extends FormRequest
             // 'hourly_rate' => 'sometimes|numeric|min:0',
             // 'birthday' => 'sometimes|date',
             // 'gender' => 'sometimes|in:male,female,other',
+            'level' => 'sometimes',
+            'introduction' => 'sometimes',
+            'hourly_rate' => 'sometimes|numeric',
+            'birthday' => 'sometimes|date',
+            'gender' => 'sometimes',
         ];
     }
 
