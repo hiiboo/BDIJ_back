@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
+    
     public function __construct()
     {
         $this->middleware('auth:sanctum');
@@ -38,14 +41,28 @@ class UserController extends Controller
         );
     }
 
+    // return only if created_at is less than 15 min ago
     public function getCurrentUserLocation(Request $request)
     {
         $user = $request->user();
-
-        return response()->json([
-            'latitude' => $user->latitude,
-            'longitude' => $user->longitude,
-        ]);
+        $now = now();
+        $createdAt = $user->created_at;
+        $diff = $now->diffInMinutes($createdAt);
+        Log::debug($diff);
+        if ($diff < 15) {
+            $data = [
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+            ];
+            return response()->json([
+                'data' => $data,
+                'message' => 'success'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'error'
+            ]);
+        }
     }
 
 
@@ -61,7 +78,7 @@ class UserController extends Controller
         ]);
     }
 
-    // get me (current user) Auth::user()を使用して、現在ログインしているユーザーを取得
+    // get me (current user) 現在ログインしているユーザーを取得、
     public function showMe(Request $request)
     {
         $user = $request->user();

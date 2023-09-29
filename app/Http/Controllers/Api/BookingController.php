@@ -78,8 +78,9 @@ class BookingController extends Controller
     }
 
 
-    public function reserve(Request $request,User $guide)
+    public function reserve(Request $request,$guide)
     {
+        $guide = User::find($guide);
 
         if ($request->user()->isGuest()) {
 
@@ -94,22 +95,23 @@ class BookingController extends Controller
             if(!$request->user()->hasSpecificBookingsAsGuest()){
                 return response()->json(['error' => 'You can not book'], 403);
             }
-            
+            Log::debug($request->user()->hasSpecificBookingsAsGuest());
             // use diffInHours method of Carbon,to calculate the difference between start_time and end_time
-            $diffInHours = Carbon::parse($request->start_time)->diffInHours(Carbon::parse($request->end_time));
-            Log::debug($request->total_guests);
-            Log::debug($request->total_amount);
-            Log::debug($diffInHours);
-            if ($request->total_guests > 2) {
-                $posted_hourly_rate = ($request->total_amount) / 0.75 / ($request->total_guests) / $diffInHours;
+            $diffInMinutes = Carbon::parse($request->start_time)->diffInMinutes(Carbon::parse($request->end_time));
+            $diffInHoursFloat = $diffInMinutes / 60.0;
+
+            if ($request->total_guests >= 2) {
+                $posted_hourly_rate = ($request->total_amount) / 0.75 / ($request->total_guests) / $diffInHoursFloat;
             } else {
-                $posted_hourly_rate = $request->total_amount / $diffInHours;
+                $posted_hourly_rate = $request->total_amount / $diffInHoursFloat;
             }
 
-            if ($posted_hourly_rate !== $guide->hourly_rate) {
-                return response()->json(['error' => 'You can\'t book this guide'], 403);
-            }
+            $epsilon = 1;
 
+            if (abs($posted_hourly_rate - $guide->hourly_rate) < $epsilon) {
+            } else {
+                return response()->json(['error' => 'Your hourly rate is not correct'], 403);
+            }
 
             $booking = Booking::create([
                 'guide_id' => $guide->id,
@@ -139,7 +141,7 @@ class BookingController extends Controller
             if ($booking->status === 'offer-pending') {
                 $booking->update([
                     'guide_booking_confirmation' => true,
-                    'status' => 'accepted',
+                    'booking_status' => 'accepted',
                 ]);
                 return response()->json(['success' => 'Booking accepted successfully'], 200);
             }

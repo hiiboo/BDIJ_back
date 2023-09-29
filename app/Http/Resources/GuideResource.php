@@ -34,6 +34,9 @@ class GuideResource extends JsonResource
             'email' => $this->email,
             // 'reviews' => ReviewResource::collection($this->whenLoaded('reviewer')),
             'bookings' => BookingResource::collection($this->whenLoaded('bookingsAsGuide')),
+            // load average rating and review count
+            'review_average' => $this->review_average,
+            'review_count' => $this->review_count,
         ];
     }
 }

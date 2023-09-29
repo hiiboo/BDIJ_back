@@ -63,6 +63,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = ['review_average', 'review_count'];
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);
@@ -96,6 +98,18 @@ class User extends Authenticatable
     public function receivedReviews()
     {
         return $this->hasMany(Review::class, 'reviewee_id');
+    }
+
+    // get user's review_average
+    public function getReviewAverageAttribute()
+    {
+        return $this->receivedReviews()->avg('rating');
+    }
+
+    // get user's review_count
+    public function getReviewCountAttribute()
+    {
+        return $this->receivedReviews()->count();
     }
      
     // check if user is guest

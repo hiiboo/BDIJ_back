@@ -34,6 +34,9 @@ class GuestResource extends JsonResource
             'longitude' => $this->longitude,
             'email' => $this->email,
             'bookings' => BookingResource::collection($this->whenLoaded('bookingsAsGuest')),
+            // load average rating and review count
+            'review_average' => $this->review_average,
+            'review_count' => $this->review_count,
         ];
     }
 }

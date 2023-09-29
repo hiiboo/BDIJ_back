@@ -100,4 +100,3 @@ Route::patch('/user/update', [UserController::class, 'update'])
 // route for changeStatus
 Route::patch('/user/change-status', [UserController::class, 'changeStatus'])
     ->name('user.changeStatus');
-
