@@ -133,6 +133,20 @@ class BookingController extends Controller
         }
     }
 
+    // create guide cancel method. use canCancelBookingAsGuide method of User model and if it returns true, update status to cancelled and change guest_booking_confirmation to false and send response with success cancel message
+    public function cancelAsGuide(Request $request, Booking $booking)
+    {
+        if ($request->user()->isGuide()) {
+            if ($request->user()->canCancelBookingAsGuide($booking)) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'guest_booking_confirmation' => false,
+                ]);
+                return response()->json(['success' => 'Booking cancelled successfully'], 200);
+            }
+        }
+    }
+
     public function accept(Request $request, Booking $booking)
     {
         //statusがoffer-pendingからacceptに変更したいというリクエストが来た時、guide_booking_confirmationをtrueに変更し、statusをacceptedに変更してbookings tableにあるbooking情報を更新する
