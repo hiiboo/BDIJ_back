@@ -28,11 +28,14 @@ class GuideController extends Controller
     {
         $guides = User::where('user_type', 'guide')
         ->where('status', 'active')
-        ->whereHas('bookingsAsGuide', function ($query) {
-            $query->whereNull('status')
-            ->orWhere('status', 'reviewed')
-            ->orWhere('status', 'cancelled')
-            ->orWhere('guide_reviewed', true);
+            ->where(function ($query) {
+        $query->whereDoesntHave('bookingsAsGuide')
+            ->orWhereHas('bookingsAsGuide', function ($bookingQuery) {
+                $bookingQuery->whereNull('status')
+                    ->orWhere('status', 'reviewed')
+                    ->orWhere('status', 'cancelled')
+                    ->orWhere('guide_reviewed', true);
+            });
         })->withTrashed()->get();
 
         return GuideResource::collection($guides);

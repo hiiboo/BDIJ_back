@@ -18,11 +18,11 @@ return new class extends Migration
             // relate guest_id from users table
             $table->foreignIdFor(User::class, 'guest_id')->constrained('users');
             // start_time
-            $table->dateTime('start_time');
+            $table->timestamp('start_time')->nullable();
             // end_time
-            $table->dateTime('end_time');
+            $table->timestamp('end_time')->nullable();
             // actual_start_time
-            $table->dateTime('actual_start_time')->nullable();
+            $table->timestamp('actual_start_time')->nullable();
             // comment
             $table->text('comment')->nullable();
             // total_guests
