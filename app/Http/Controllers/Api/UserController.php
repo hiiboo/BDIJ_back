@@ -32,7 +32,7 @@ class UserController extends Controller
             'id' => $user->id,
             'user_type' => $user->user_type,
             'user_status' => $user->status,
-            'bookings_status' => $lastBookingStatus,
+            'booking_status' => $lastBookingStatus,
         ];
         return response()->json([
             "data" => $data,

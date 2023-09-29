@@ -27,6 +27,14 @@ class Booking extends Model
         'guide_reviewed',
     ];
 
+    protected $dates = ['start_time', 'end_time', 'actual_start_time'];
+
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+        'actual_start_time' => 'datetime',
+    ];
+
     public function guest()
     {
         return $this->belongsTo(User::class, 'guest_id');
