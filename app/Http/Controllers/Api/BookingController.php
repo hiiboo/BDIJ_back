@@ -155,9 +155,13 @@ class BookingController extends Controller
             if ($booking->status === 'offer-pending') {
                 $booking->update([
                     'guide_booking_confirmation' => true,
-                    'booking_status' => 'accepted',
+                    'status' => 'accepted',
                 ]);
-                return response()->json(['success' => 'Booking accepted successfully'], 200);
+                // return message and booking data
+                return response()->json([
+                    'data' => $booking,
+                    'message' => 'success'
+                ]);
             }
         }
     }
