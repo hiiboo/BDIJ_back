@@ -179,7 +179,11 @@ class BookingController extends Controller
                     'status' => 'started',
                     'actual_start_time' => now(),
                 ]);
-                return response()->json(['success' => 'Booking started successfully'], 200);
+                 // return message and booking data
+                return response()->json([
+                    'data' => $booking,
+                    'message' => 'success'
+                ]);
             }
         }
 
@@ -194,7 +198,11 @@ class BookingController extends Controller
                     'start_confirmation' => false,
                     'status' => 'finished',
                 ]);
-                return response()->json(['success' => 'Booking finished successfully'], 200);
+                  // return message and booking data
+                return response()->json([
+                    'data' => $booking,
+                    'message' => 'booking finished successfully'
+                ]);
             }
         }
     }
@@ -208,8 +216,11 @@ class BookingController extends Controller
             "actual_start_time" => $booking->actual_start_time,
             "now" => now(),
         ];
-        
-        return response()->json(['data' => $data], 200);
+          // return message and booking data
+        return response()->json([
+            'data' => $data,
+            'message' => 'success'
+        ]);
 
     }
 }
