@@ -157,24 +157,30 @@ class User extends Authenticatable
     public function hasSpecificBookingsAsGuest()
     {
         return $this->where('user_type', 'guest')
-            ->whereHas('bookingsAsGuest', function ($query) {
-            $query->whereNull('status')
-                ->orWhere('status', 'reviewed')
-                ->orWhere('status', 'cancelled')
-                ->orWhere('guest_reviewed', true);
-        })->exists();
+            ->where(function ($query) {
+                $query->whereDoesntHave('bookingsAsGuest')
+                ->orWhereHas('bookingsAsGuest', function ($query) {
+                    $query->whereNull('status')
+                        ->orWhere('status', 'reviewed')
+                        ->orWhere('status', 'cancelled')
+                        ->orWhere('guide_reviewed', true);
+                });
+            })->exists();
     }
 
     // hasSpecificBookingsAsGuide method
     public function hasSpecificBookingsAsGuide()
     {
         return $this->where('user_type', 'guide')
-            ->where('status', 'active')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->whereNull('status')
+        ->where('status', 'active')
+        ->where(function ($query) {
+            $query->whereDoesntHave('bookingsAsGuide')
+            ->orWhereHas('bookingsAsGuide', function ($query) {
+                $query->whereNull('status')
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guide_reviewed', true);
+            });
         })->exists();
     }
 
