@@ -65,11 +65,21 @@ class UserController extends Controller
         }
     }
 
-
+    // use hasStatedBookingsAsGuide() in User.php
     public function update(Request $request)
     {
         //update current user's profile use UserResource
         $user = $request->user();
+        Log::debug($user);
+        Log::debug($user->hasStartedBookingsAsGuide());
+        if ($user->hasStartedBookingsAsGuide()) {
+            return response()->json([
+                'message' => 'Updates are not allwed during a tour',
+            ],
+                403
+            );
+        }
+
         $data = $request->all();
         $user->update($data);
         return response()->json([
@@ -77,7 +87,7 @@ class UserController extends Controller
             'message' => 'success'
         ]);
     }
-
+    
     // get me (current user) 現在ログインしているユーザーを取得、
     public function showMe(Request $request)
     {

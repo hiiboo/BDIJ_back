@@ -48,7 +48,9 @@ class ReviewController extends Controller
             $booking->save();
         }
 
-        return response()->json(['success' => 'Review posted successfully'], 200);
+        return response()->json(['success' => 'Guest successfully posted review',
+            'guest_reviewed' => true
+        ], 200);
 
     }
 
@@ -83,7 +85,8 @@ class ReviewController extends Controller
             $booking->guide_reviewed = false;
             $booking->save();
         }
-
-        return response()->json(['success' => 'Review posted successfully'], 200);
+        // guide post review
+        return response()->json(['success' => 'Guide successfully posted review',
+    'guide_reviewed' => true], 200);
     }
 }

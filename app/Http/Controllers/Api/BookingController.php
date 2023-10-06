@@ -150,7 +150,7 @@ class BookingController extends Controller
     public function accept(Request $request, Booking $booking)
     {
         //statusがoffer-pendingからacceptに変更したいというリクエストが来た時、guide_booking_confirmationをtrueに変更し、statusをacceptedに変更してbookings tableにあるbooking情報を更新する
-        Log::debug($booking);
+        // Log::debug($booking);
         if ($request->user()->isGuide()) {
             if ($booking->status === 'offer-pending') {
                 $booking->update([
@@ -162,7 +162,15 @@ class BookingController extends Controller
                     'data' => $booking,
                     'message' => 'success'
                 ]);
-            }
+            } else {
+                return response()->json([
+                    'message' => 'booking status is not offer-pending'
+                ]);
+            }   
+        } else {
+            return response()->json([
+                'message' => 'you are not a guide or not logged in as a guide' 
+            ]);
         }
     }
 

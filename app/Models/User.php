@@ -184,6 +184,15 @@ class User extends Authenticatable
         })->exists();
     }
 
+    // hasStatedBookingsAsGuide method whereDoesntHave('bookingsAsGuide')is not necessary
+    public function hasStartedBookingsAsGuide()
+    {
+        return $this->where('user_type', 'guide')
+            ->whereHas('bookingsAsGuide', function ($query) {
+            $query->where('status', 'started');
+        })->exists();
+    }
+
     // canCancelBookingAsGuest method(user_type = guest  & whose booking status = offer-pending or accepted)
     public function canCancelBookingAsGuest()
     {
