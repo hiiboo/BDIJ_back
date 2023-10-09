@@ -133,17 +133,31 @@ class BookingController extends Controller
         }
     }
 
-    // create guide cancel method. use canCancelBookingAsGuide method of User model and if it returns true, update status to cancelled and change guest_booking_confirmation to false and send response with success cancel message
-    public function cancelAsGuide(Request $request, Booking $booking)
+    // create guide cancel method and huest cancel method depending on guest or guide use canCancelBookingAsGuide method of User model and if it returns true, update status to cancelled and change guest_booking_confirmation to false and change total_amount to 0 and send response with success cancel message
+    public function cancel(Request $request, Booking $booking)
     {
         if ($request->user()->isGuide()) {
             if ($request->user()->canCancelBookingAsGuide($booking)) {
                 $booking->update([
                     'status' => 'cancelled',
                     'guest_booking_confirmation' => false,
+                    'total_amount' => 0,
                 ]);
                 return response()->json(['success' => 'Booking cancelled successfully'], 200);
             }
+        }
+        if ($request->user()->isGuest()) {
+            if ($request->user()->canCancelBookingAsGuest($booking)) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'guide_booking_confirmation' => false,
+                    'guest_booking_confirmation' => false,
+                    'total_amount' => $booking->calculateCancellationTotalAmount(),
+                ]);
+                return response()->json(['success' => 'Booking cancelled successfully'], 200);
+            }
+        } else {
+            return response()->json(['error' => 'User is neither a guide nor a guest or not logged in'], 403);
         }
     }
 
