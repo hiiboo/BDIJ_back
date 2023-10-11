@@ -45,9 +45,13 @@ class BookingController extends Controller
         if ($user->isGuest()) {
             $user->load('lastBookingAsGuest');
             $lastBooking = $user->lastBookingAsGuest;
+            // add guest image to $lastBooking 
+            $lastBooking->load('guest');
         } elseif ($user->isGuide()) {
             $user->load('lastBookingAsGuide');
             $lastBooking = $user->lastBookingAsGuide;
+            // add guide image to $lastBooking
+            $lastBooking->load('guide');
         } else {
             return response()->json(['error' => 'User is neither a guide nor a guest'], 403);
         }
