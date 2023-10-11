@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Log\Logger;
+use App\Notifications\BookingReceived;
+use App\Notifications\BookingAccepted;
 
 class BookingController extends Controller
 {
@@ -125,6 +127,9 @@ class BookingController extends Controller
                 'guest_booking_confirmation' => true,
             ]);
 
+            // use BookingReceived notification
+            $guide->notify(new BookingReceived($booking));
+
             // return $booking;
             return response()->json([
                 'data' => $booking,
@@ -133,20 +138,34 @@ class BookingController extends Controller
         }
     }
 
-    // create guide cancel method. use canCancelBookingAsGuide method of User model and if it returns true, update status to cancelled and change guest_booking_confirmation to false and send response with success cancel message
-    public function cancelAsGuide(Request $request, Booking $booking)
+    // create guide cancel method and huest cancel method depending on guest or guide use canCancelBookingAsGuide method of User model and if it returns true, update status to cancelled and change guest_booking_confirmation to false and change total_amount to 0 and send response with success cancel message
+    public function cancel(Request $request, Booking $booking)
     {
         if ($request->user()->isGuide()) {
             if ($request->user()->canCancelBookingAsGuide($booking)) {
                 $booking->update([
                     'status' => 'cancelled',
                     'guest_booking_confirmation' => false,
+                    'total_amount' => 0,
                 ]);
                 return response()->json(['success' => 'Booking cancelled successfully'], 200);
             }
         }
+        if ($request->user()->isGuest()) {
+            if ($request->user()->canCancelBookingAsGuest($booking)) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'guide_booking_confirmation' => false,
+                    'guest_booking_confirmation' => false,
+                    'total_amount' => $booking->calculateCancellationTotalAmount(),
+                ]);
+                return response()->json(['success' => 'Booking cancelled successfully'], 200);
+            }
+        } else {
+            return response()->json(['error' => 'User is neither a guide nor a guest or not logged in'], 403);
+        }
     }
-
+    
     public function accept(Request $request, Booking $booking)
     {
         //statusがoffer-pendingからacceptに変更したいというリクエストが来た時、guide_booking_confirmationをtrueに変更し、statusをacceptedに変更してbookings tableにあるbooking情報を更新する
@@ -157,6 +176,8 @@ class BookingController extends Controller
                     'guide_booking_confirmation' => true,
                     'status' => 'accepted',
                 ]);
+                // send email to guest saying that booking has been cancelled using BookingAccepted notification wih mailtrap
+                $booking->guest->notify(new BookingAccepted($booking));
                 // return message and booking data
                 return response()->json([
                     'data' => $booking,
