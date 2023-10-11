@@ -22,6 +22,8 @@ class BookingController extends Controller
 
     public function showRelatedUserAndBooking(Booking $booking)
     {
+        // use policy showRelatedUserAndBooking
+        $this->authorize('showRelatedUserAndBooking', $booking);
         $user = Auth::user();
 
         if ($user->isGuest()) {
