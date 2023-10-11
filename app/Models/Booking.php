@@ -50,6 +50,33 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    // get first name  + last name from booking guest
+    public function getGuestNameAttribute()
+    {
+        return $this->guest->first_name . ' ' . $this->guest->last_name;
+    }
+
+    // get first name  + last name from booking guide
+    public function getGuideNameAttribute()
+    {
+        return $this->guide->first_name . ' ' . $this->guide->last_name;
+    }
+    // get booking time with the format of 'Y-m-d H:i:s'
+    public function getBookingTimeAttribute()
+    {
+        return $this->start_time->format('Y-m-d H:i:s');
+    }
+    // get booking duration using start_time and end_time interval
+    public function getBookingDurationAttribute()
+    {
+        $interval = $this->start_time->diff($this->end_time);
+        if ($interval->h > 0) {
+            return $interval->h . ' hours';
+        } else {
+            return $interval->i . ' minutes';
+        }
+    }
+
     //booking calculateCancellation total_amount for guest if status = offer-pending then return total_amount =0, status = accepted then return total_amount * 0.2 other status return 
     public function calculateCancellationTotalAmount()
     {
