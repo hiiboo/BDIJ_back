@@ -28,12 +28,15 @@ class UserController extends Controller
         }
 
         $lastBookingStatus = $lastBooking ? $lastBooking->status : null;
+        // get guest_reviewed and guide_reviewed from $lastBooking
+        $guestReviewed = $lastBooking ? $lastBooking->guest_reviewed : null;
+        $guideReviewed = $lastBooking ? $lastBooking->guide_reviewed : null;
         $data = [
             'id' => $user->id,
             'user_type' => $user->user_type,
             'user_status' => $user->status,
-            'guest_reviewed' => $user->guest_reviewed,
-            'guide_reviewed' => $user->guide_reviewed,
+            'guest_reviewed' => $guestReviewed,
+            'guide_reviewed' => $guideReviewed,
             'profile_image' => $user->profile_image,
             'booking_status' => $lastBookingStatus,
         ];
