@@ -26,17 +26,7 @@ class GuideController extends Controller
     // get data for user_type = guide
     public function index()
     {
-        $guides = User::where('user_type', 'guide')
-        ->where('status', 'active')
-            ->where(function ($query) {
-        $query->whereDoesntHave('bookingsAsGuide')
-            ->orWhereHas('bookingsAsGuide', function ($bookingQuery) {
-                $bookingQuery->whereNull('status')
-                    ->orWhere('status', 'reviewed')
-                    ->orWhere('status', 'cancelled')
-                    ->orWhere('guide_reviewed', true);
-            });
-        })->withTrashed()->get();
+        $guides = User::getSpecificGuides();
 
         return GuideResource::collection($guides);
     }

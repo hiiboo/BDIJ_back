@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use \Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -140,76 +141,117 @@ class User extends Authenticatable
         return $booking->guest;
     }
 
-    // user_type = guide & status = active & whose booking status = null、reviewed、cancelled or guide_reviewed=true & cosidering soft delete
-    public function scopeHasSpecificBookingsAsGuide($query)
+    public function doesntHaveBookingsAsGuide()
     {
-        return $query->where('user_type', 'guide')
-            ->where('status', 'active')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->whereNull('status')
-                ->orWhere('status', 'reviewed')
-                ->orWhere('status', 'cancelled')
-                ->orWhere('guide_reviewed', true);
-        })->withtrashed();
+        return $this->bookingsAsGuide()->doesntExist();
     }
 
-    //user_type = guest & whose booking status = null、reviewed、cancelled or guest_reviewed = true & cosidering soft delete and return true or false
-    public function hasSpecificBookingsAsGuest()
+    public function doesntHaveBookingsAsGuest()
     {
-        return $this->where('user_type', 'guest')
+        return $this->bookingsAsGuest()->doesntExist();
+    }
+
+    public function hasBookingsWithEligibleStatusForGuide()
+    {
+        return $this->bookingsAsGuide()
             ->where(function ($query) {
-                $query->whereDoesntHave('bookingsAsGuest')
-                ->orWhereHas('bookingsAsGuest', function ($query) {
-                    $query->whereNull('status')
-                        ->orWhere('status', 'reviewed')
-                        ->orWhere('status', 'cancelled')
-                        ->orWhere('guide_reviewed', true);
-                });
-            })->exists();
-    }
-
-    // hasSpecificBookingsAsGuide method
-    public function hasSpecificBookingsAsGuide()
-    {
-        return $this->where('user_type', 'guide')
-        ->where('status', 'active')
-        ->where(function ($query) {
-            $query->whereDoesntHave('bookingsAsGuide')
-            ->orWhereHas('bookingsAsGuide', function ($query) {
                 $query->whereNull('status')
                 ->orWhere('status', 'reviewed')
                 ->orWhere('status', 'cancelled')
                 ->orWhere('guide_reviewed', true);
-            });
-        })->exists();
+            })->exists();
+    }
+
+    public function hasBookingsWithEligibleStatusForGuest()
+    {
+        return $this->bookingsAsGuest()
+            ->where(function ($query) {
+                $query->whereNull('status')
+                ->orWhere('status', 'reviewed')
+                ->orWhere('status', 'cancelled')
+                ->orWhere('guest_reviewed', true);
+            })->exists();
+    }
+
+    public function isGuideActive()
+    {
+        return $this->status === 'active';
+    }
+
+    public function hasSpecificBookingsAsGuide()
+    {
+        if ($this->doesntHaveBookingsAsGuide()) {
+            return true;
+        }
+
+        if (!$this->isGuideActive()) {
+            return false;
+        }
+
+        return $this->hasBookingsWithEligibleStatusForGuide();
+    }
+
+    public function hasSpecificBookingsAsGuest()
+    {
+        if ($this->doesntHaveBookingsAsGuest()) {
+            return true;
+        }
+
+        return $this->hasBookingsWithEligibleStatusForGuest();
+    }
+
+    public function isEligibleForGuideStatus()
+    {
+        $lastBooking = $this->lastBookingAsGuide;
+
+        if (is_null($lastBooking)) {
+            return true;
+        }
+
+        return in_array($lastBooking->status, [null, 'reviewed', 'cancelled']) || $lastBooking->guide_reviewed === true;
+    }
+
+
+    public static function getSpecificGuides()
+    {
+        return self::all()->filter(function ($user) {
+            return $user->isGuide() && $user->isGuideActive() && (!$user->bookingsAsGuide()->exists() ||
+                $user->isEligibleForGuideStatus()
+            );
+        });
     }
 
     // hasStatedBookingsAsGuide method whereDoesntHave('bookingsAsGuide')is not necessary
     public function hasStartedBookingsAsGuide()
     {
-        return $this->where('user_type', 'guide')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->where('status', 'started');
-        })->exists();
+        if (!$this->isGuide()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuide()->where('status', 'started')->exists();
     }
 
     // canCancelBookingAsGuest method(user_type = guest  & whose booking status = offer-pending or accepted)
     public function canCancelBookingAsGuest()
     {
-        return $this->where('user_type', 'guest')
-            ->whereHas('bookingsAsGuest', function ($query) {
-            $query->where('status', 'offer-pending')
-                ->orWhere('status', 'accepted');
-        })->exists();
+        if ($this->isGuest()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuest()
+        ->where('status', 'offer-pending')
+        ->orWhere('status', 'accepted')
+        ->exists();
     }
 
     // canCancelBookingAsGuide method(user_type = guide  & whose booking status = offer-pending)
     public function canCancelBookingAsGuide()
     {
-        return $this->where('user_type', 'guide')
-            ->whereHas('bookingsAsGuide', function ($query) {
-            $query->where('status', 'offer-pending');
-        })->exists();
+        if ($this->isGuide()) {
+            return false;
+        }
+
+        return $this->bookingsAsGuide()->where('status', 'offer-pending')->exists();
     }
 
     // canGuestWriteReview (user_type = guest & whose booking status = finished & whose booking guest_reviewed = false)
