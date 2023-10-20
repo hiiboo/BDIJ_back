@@ -40,13 +40,13 @@ class BookingResource extends JsonResource
             'guest_reviewed' =>
             $this->guest_reviewed,
             'start_time' =>
-            $this->start_time,
+            $this->booking_start_time,
             'end_time' =>
-            $this->end_time,
+            $this->booking_end_time,
             'actual_start_time' =>
-            $this->actual_start_time,
-            'actual_end_time' =>
-            $this->actual_end_time,
+            $this->actual_booking_start_time,
+            // 'actual_end_time' =>
+            // $this->actual_end_time,
             'comment' =>
             $this->comment,
             'total_guests' =>

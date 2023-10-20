@@ -246,9 +246,9 @@ class BookingController extends Controller
     {
         //return bookings tableからstart_time, end_time,actual_start_timeを、そしてnow()から現在時刻を一緒に返す
         $data=[
-            "start_time" => $booking->start_time,
-            "end_time" => $booking->end_time,
-            "actual_start_time" => $booking->actual_start_time,
+            "start_time" => $booking->booking_start_time,
+            "end_time" => $booking->booking_end_time,
+            "actual_start_time" => $booking->actual_booking_start_time,
             "now" => now(),
         ];
           // return message and booking data
