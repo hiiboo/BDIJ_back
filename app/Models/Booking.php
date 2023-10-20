@@ -35,6 +35,34 @@ class Booking extends Model
         'actual_start_time' => 'datetime',
     ];
 
+    public function getBookingStartTimeAttribute()
+    {
+        return $this->start_time->format('Y-m-d\TH:i:s\Z');
+    }
+
+    public function getBookingEndTimeAttribute()
+    {
+        return $this->end_time->format('Y-m-d\TH:i:s\Z');
+    }
+
+    public function getActualBookingStartTimeAttribute()
+    {
+        if ($this->actual_start_time) {
+            return $this->actual_start_time->format('Y-m-d\TH:i:s\Z');
+        }
+        return null;
+    }
+
+
+    protected function convertToIso8601ZuluString($dateTime)
+    {
+        $clone = clone $dateTime;
+        return $clone->setTimezone('UTC')->toIso8601ZuluString();
+    }
+
+
+
+
     public function guest()
     {
         return $this->belongsTo(User::class, 'guest_id');
