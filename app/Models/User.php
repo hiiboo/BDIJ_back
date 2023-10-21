@@ -93,7 +93,7 @@ class User extends Authenticatable
     public function writtenReviews()
     {
         return $this->hasMany(Review::class, 'reviewer_id');
-    }   
+    }
 
     public function receivedReviews()
     {
@@ -111,7 +111,7 @@ class User extends Authenticatable
     {
         return $this->receivedReviews()->count();
     }
-     
+
     // check if user is guest
     public function isGuest()
     {

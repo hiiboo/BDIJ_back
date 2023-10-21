@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    
+
     public function __construct()
     {
         $this->middleware('auth:sanctum');
@@ -18,7 +18,7 @@ class UserController extends Controller
     public function showCurrent(Request $request)
     {
         $user = $request->user();
-        
+
         if($user->isGuest()){
             $user->load('lastBookingAsGuest');
             $lastBooking = $user->lastBookingAsGuest;
@@ -71,29 +71,68 @@ class UserController extends Controller
         }
     }
 
-    // use hasStatedBookingsAsGuide() in User.php
+    // // use hasStatedBookingsAsGuide() in User.php
+    // public function update(Request $request)
+    // {
+    //     //update current user's profile use UserResource
+    //     $user = $request->user();
+    //     Log::debug($user);
+    //     Log::debug($user->hasStartedBookingsAsGuide());
+    //     if ($user->hasStartedBookingsAsGuide()) {
+    //         return response()->json([
+    //             'message' => 'Updates are not allwed during a tour',
+    //         ],
+    //             403
+    //         );
+    //     }
+
+    //     $data = $request->all();
+    //     $user->update($data);
+    //     return response()->json([
+    //         'data' => $user,
+    //         'message' => 'success'
+    //     ]);
+    // }
+
     public function update(Request $request)
     {
-        //update current user's profile use UserResource
         $user = $request->user();
+        Log::debug($request->all());
         Log::debug($user);
         Log::debug($user->hasStartedBookingsAsGuide());
+
         if ($user->hasStartedBookingsAsGuide()) {
             return response()->json([
-                'message' => 'Updates are not allwed during a tour',
-            ],
-                403
-            );
+                'message' => 'Updates are not allowed during a tour',
+            ], 403);
         }
 
-        $data = $request->all();
-        $user->update($data);
+        // ファイルがリクエストに存在するかチェック
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+
+            // ファイル名をメールアドレスから設定
+            $filename = $user->email . '.' . $file->getClientOriginalExtension();
+
+            // ファイルを保存
+            $path = $file->storeAs('profile_images', $filename, 'public');
+            $user->profile_image = '/storage/' . $path;
+        }
+
+        // その他のデータを更新
+        $data = $request->except(['profile_image']); // ファイルを除外
+        $updated = $user->update($data);
+        Log::debug("User update result: " . ($updated ? "Success" : "Failure"));
+        $user->refresh(); // データベースから最新の情報を取得
+        Log::debug($user); // 更新後のユーザー情報をログ出力
+
         return response()->json([
             'data' => $user,
             'message' => 'success'
         ]);
+        Log::debug('Data to update: ' . json_encode($data));
     }
-    
+
     // get me (current user) 現在ログインしているユーザーを取得、
     public function showMe(Request $request)
     {
