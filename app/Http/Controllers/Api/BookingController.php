@@ -134,7 +134,7 @@ class BookingController extends Controller
             ]);
 
             // use BookingReceived notification
-            // $guide->notify(new BookingReceived($booking));
+            $guide->notify(new BookingReceived($booking));
 
             // return $booking;
             return response()->json([
@@ -183,7 +183,7 @@ class BookingController extends Controller
                     'status' => 'accepted',
                 ]);
                 // send email to guest saying that booking has been cancelled using BookingAccepted notification wih mailtrap
-                // $booking->guest->notify(new BookingAccepted($booking));
+                $booking->guest->notify(new BookingAccepted($booking));
                 // return message and booking data
                 return response()->json([
                     'data' => $booking,
